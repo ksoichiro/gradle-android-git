@@ -1,14 +1,17 @@
 buildscript {
     repositories {
+        mavenCentral()
         maven {
             url uri('../repo')
         }
     }
     dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.+'
         classpath 'com.github.ksoichiro:gradle-android-git:0.1.+'
     }
 }
 
+apply plugin: 'com.android.application'
 apply plugin: 'gag'
 
 // To test applying 'gag' plugin:
@@ -16,3 +19,21 @@ apply plugin: 'gag'
 // $ ./gradlew uploadArchives
 // $ cd samples/consumer/
 // $ gradle -q joke
+
+// This insert the 'joke' task before build android app.
+preBuild.dependsOn {
+    joke
+}
+
+// To test applying 'gag' plugin with 'com.android.application':
+// $ cd /path/to/gradle-android-git
+// $ ./gradlew uploadArchives
+// $ cd samples/consumer/
+// $ gradle assemble
+// Then you can see :joke task is executed before :preBuild
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.1.0"
+}
+
