@@ -1,0 +1,18 @@
+buildscript {
+    repositories {
+        maven {
+            url uri('../repo')
+        }
+    }
+    dependencies {
+        classpath 'com.github.ksoichiro:gradle-android-git:0.1.+'
+    }
+}
+
+apply plugin: 'gag'
+
+// To test applying 'gag' plugin:
+// $ cd /path/to/gradle-android-git
+// $ ./gradlew uploadArchives
+// $ cd samples/consumer/
+// $ gradle -q joke
