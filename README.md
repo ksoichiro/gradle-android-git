@@ -41,7 +41,7 @@ apply plugin: 'com.github.ksoichiro.gag'
 
 git {
     dependencies {
-        repo location: 'https://github.com/ksoichiro/AndroidFormEnhancer.git', name: 'afe', commit: 'a9d4496adee3aa79e118c8db9ddd4a0fff1c03d9'        repo location: 'https://github.com/ksoichiro/SimpleAlertDialog-for-Android.git', name: sad', tag: 'v1.1.1'
+        repo location: 'https://github.com/ksoichiro/AndroidFormEnhancer.git', name: 'afe', commit: 'a9d4496adee3aa79e118c8db9ddd4a0fff1c03d9'        repo location: 'https://github.com/ksoichiro/SimpleAlertDialog-for-Android.git', name: 'sad', tag: 'v1.1.1'
     }
 }
 
