@@ -10,7 +10,6 @@ class GagPlugin implements Plugin<Project> {
         target.git.extensions.create("dependencies", Dependencies, target)
 
         target.task('update', type: UpdateTask)
-        target.task('joke', type: JokeTask)
 
         target.task('listConfig') << {
             target.git.dependencies.repos.each() { repo ->
