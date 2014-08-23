@@ -80,7 +80,7 @@ We will forget to do this.
 
 Following steps always should be done for each dependencies when building apps:
 
-```
+```sh
 # If the REPO doesn't exist:
 $ git clone REPO
 
