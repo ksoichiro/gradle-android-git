@@ -31,4 +31,23 @@ $ cd REPO
 $ ./gradlew assemble
 ```
 
+### Configure with codes, not operations
+
+All of the configurations to manage dependencies should be managed by codes.  
+Because people may forget to do some operations,  
+which causes unstable environment,  
+and unfortunately if it doesn't cause any build errors, maybe it will cause very different bugs.
+
+This is not good:
+
+```sh
+$ git clone YOUR_APP_REPO.git REPO
+$ cd REPO
+
+# Maybe forcing this step causes troubles...
+$ ./gradlew initGitDependencies
+
+$ ./gradlew assemble
+```
+
 
