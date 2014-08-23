@@ -44,12 +44,11 @@ class UpdateTask extends DefaultTask {
         println "Done. Please put `library/` to your .gitignore."
     }
 
-    static def checkout(Repo repo) {
+    def checkout(Repo repo) {
         def version = repo.commit == null ? repo.tag : repo.commit;
-        def wd = "library/${repo.name}"
+        def wd = new File("library/${repo.name}")
 
         def proc = execProc("git checkout master", wd)
-        //proc.inputStream.eachLine {println it}
         proc.waitFor()
 
         proc = execProc("git fetch", wd)
@@ -62,16 +61,10 @@ class UpdateTask extends DefaultTask {
             println "Switch to ${version}..."
             proc = execProc("git checkout -f ${version}", wd)
             proc.waitFor()
-            println "${proc.exitValue()}"
-            println "${proc.in.text}"
-            println "${proc.err.text}"
         }
     }
 
-    static def execProc(String cmd, String cwd) {
-        def processBuilder=new ProcessBuilder(cmd)
-        processBuilder.redirectErrorStream(true)
-        processBuilder.directory(new File(cwd))
-        processBuilder.start()
+    static def execProc(String cmd, File cwd) {
+        cmd.execute([], cwd)
     }
 }
