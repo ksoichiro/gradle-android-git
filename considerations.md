@@ -1,8 +1,10 @@
 # Considerations
 
+Considerations of design to make 'gag' a useful plugin.
+
 ## Names of the commands
 
-### Confliction with other names
+### Avoid conflicts with other names
 
 Keeping Android plugin commands' availability is the highest priority.  
 So names which have prefixes like following should be avoided:
@@ -38,16 +40,33 @@ Because people may forget to do some operations,
 which causes unstable environment,  
 and unfortunately if it doesn't cause any build errors, maybe it will cause very different bugs.
 
-This is not good:
+So this is not good:
 
 ```sh
 $ git clone YOUR_APP_REPO.git REPO
 $ cd REPO
 
 # Maybe forcing this step causes troubles...
-$ ./gradlew initGitDependencies
+$ ./gradlew initGagDependencies
 
 $ ./gradlew assemble
 ```
 
+### Always update dependencies
 
+To updating dependencies(repositories) only when there are any updates is not good workflow.  
+We will forget to do this.
+
+Following steps always should be done for each dependencies when building apps:
+
+```
+# If the REPO doesn't exist:
+$ git clone REPO
+
+# Check out the target version.
+# REPO should not be edited,
+# so discarding changes will be appropriate operation
+$ git checkout --force VERSION
+```
+
+So updating task should be inserted before `:preBuild` task or something like that.
