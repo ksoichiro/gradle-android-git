@@ -2,6 +2,27 @@
 
 Considerations of design to make 'gag' a useful plugin.
 
+## Improvements
+
+What point does this tool improve?
+
+* We don't have to commit library code base to our app's repo.
+* We can develop our own libraries with library-client apps because it's easy to switch library version.
+* We can use many libraries which are not released on Maven central or jcenter.
+
+## Prerequisites
+
+### Git installation
+
+Git must be installed on your machine.  
+'gag' doesn't contain its own Git binary or `jgit` libs.  
+
+### Gradle configured libraries
+
+Although 'gag' enables to manage Git repos as the Gradle dependencies,  
+building apps is still Gradle's responsibility.  
+So libraries which are cloned by 'gag' must be configured with `build.gradle`.
+
 ## Names of the commands
 
 ### Avoid conflicts with other names
