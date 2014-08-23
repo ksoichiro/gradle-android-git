@@ -70,3 +70,23 @@ $ git checkout --force VERSION
 ```
 
 So updating task should be inserted before `:preBuild` task or something like that.
+
+### Add new dependency smoothly
+
+Currently, following steps will be needed to introduce a new Git dependency.
+
+1. Add `repo` configuration to `git.dependencies` closure.
+1. Add `compile project(':library:foo')` to `project.dependencies`.
+1. Add `include :library:foo` to `settings.gradle`.
+This is necessary to evaluate dependencies for gradle but it is not supported to add sub-projects dynamically by plugins.
+
+Gradle evaluates `settings.gradle` before the configuration phase,  
+so plugin configuration initializers(constructors) should prepare for gradle to be recognized as valid sub-projects.  
+Example:
+
+1. Make its directories
+1. Create minimum files to be recognized as a project(`build.gradle`)
+
+Without these steps, projects can't be built after checking out the root project repository.
+
+Perhaps the second of the above steps should be replaced to `git clone` or something.
