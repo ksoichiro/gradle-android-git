@@ -24,6 +24,7 @@ public class MainActivity extends FragmentActivity {
     private void popup() {
         new SimpleAlertDialogSupportFragment.Builder()
                 .setMessage("Hello, world!")
+                .setPositiveButton(android.R.string.ok)
                 .create().show(getSupportFragmentManager(), "dialog");
     }
 
