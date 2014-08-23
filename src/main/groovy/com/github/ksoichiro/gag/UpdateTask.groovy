@@ -6,6 +6,7 @@ import org.gradle.api.tasks.TaskAction
 class UpdateTask extends DefaultTask {
     @TaskAction
     def exec() {
+        def baseDir = project.git.directory
         println "Dependencies managed by gag:"
         project.git.dependencies.repos.each() { Repo repo ->
             println "dependency:"
@@ -13,11 +14,11 @@ class UpdateTask extends DefaultTask {
             println "  name: ${repo.name}"
             println "  commit: ${repo.commit}"
             println "  tag: ${repo.tag}"
-            def repoDir = project.file('library/' + repo.name)
+            def repoDir = project.file(baseDir + '/' + repo.name)
             if (!repoDir.exists()) {
                 // This is the first time, so we clone
                 println "  Initialize dependency '${repo.name}' from '${repo.location}'..."
-                def cmd = "git clone ${repo.location} ./library/${repo.name}"
+                def cmd = "git clone ${repo.location} ${baseDir}/${repo.name}"
                 def proc = cmd.execute()
                 proc.waitFor()
                 if (proc.exitValue() == 0) {
@@ -25,12 +26,12 @@ class UpdateTask extends DefaultTask {
                     println "  To use this dependency, you need some actions:"
                     println "  * Add following lines to your `settings.gradle` in the root project directory."
                     println ""
-                    println "      include ':library:${repo.name}'"
+                    println "      include ':${baseDir}:${repo.name}'"
                     println ""
                     println "  * Add the dependency description to your `build.gradle`."
                     println ""
                     println "      dependencies {"
-                    println "          compile project(':library:${repo.name}')"
+                    println "          compile project(':${baseDir}:${repo.name}')"
                     println "      }"
                     println ""
                 } else {
@@ -41,12 +42,12 @@ class UpdateTask extends DefaultTask {
             }
             checkout repo
         }
-        println "Done. Please put `library/` to your .gitignore."
+        println "Done. Please put `${baseDir}/` to your .gitignore."
     }
 
     def checkout(Repo repo) {
         def version = repo.commit == null ? repo.tag : repo.commit;
-        def wd = new File("library/${repo.name}")
+        def wd = new File("${project.git.directory}/${repo.name}")
 
         def proc = execProc("git checkout master", wd)
         proc.waitFor()

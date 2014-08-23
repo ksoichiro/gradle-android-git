@@ -24,6 +24,8 @@ class GagPlugin implements Plugin<Project> {
 }
 
 class GagPluginExtension {
+    String directory = "library"
+
     Project project
 
     GagPluginExtension(Project project) {
