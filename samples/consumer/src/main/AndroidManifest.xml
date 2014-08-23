@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.gihub.ksoichiro.gag.samples.consumer" >
+    package="com.github.ksoichiro.gag.samples.consumer" >
 
     <application
         android:allowBackup="true"

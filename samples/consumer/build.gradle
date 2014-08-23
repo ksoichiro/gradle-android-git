@@ -20,9 +20,9 @@ apply plugin: 'gag'
 // $ cd samples/consumer/
 // $ gradle -q joke
 
-// This insert the 'joke' task before build android app.
+// This insert the 'update' task before build android app.
 preBuild.dependsOn {
-    joke
+    update
 }
 
 git {
@@ -44,5 +44,13 @@ git {
 android {
     compileSdkVersion 19
     buildToolsVersion "19.1.0"
+    defaultConfig {
+        minSdkVersion 8
+    }
 }
 
+dependencies {
+    compile 'com.android.support:support-v4:20.0.+'
+    compile project(':library:afe:androidformenhancer')
+    compile project(':library:sad:simplealertdialog')
+}
