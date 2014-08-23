@@ -46,26 +46,32 @@ class UpdateTask extends DefaultTask {
 
     static def checkout(Repo repo) {
         def version = repo.commit == null ? repo.tag : repo.commit;
-        def cmd = "cd library/${repo.name} && git checkout master"
-        def proc = cmd.execute()
+        def wd = "library/${repo.name}"
+
+        def proc = execProc("git checkout master", wd)
+        //proc.inputStream.eachLine {println it}
         proc.waitFor()
 
-        cmd = "cd library/${repo.name} && git fetch"
-        proc = cmd.execute()
+        proc = execProc("git fetch", wd)
         proc.waitFor()
 
-        cmd = "cd library/${repo.name} && git checkout -f master"
-        proc = cmd.execute()
-        proc.waitFor()
-
-        cmd = "cd library/${repo.name} && git pull origin master"
-        proc = cmd.execute()
+        proc = execProc("git pull origin master", wd)
         proc.waitFor()
 
         if (version != null) {
-            cmd = "cd library/${repo.name} && git checkout ${version}"
-            proc = cmd.execute()
+            println "Switch to ${version}..."
+            proc = execProc("git checkout -f ${version}", wd)
             proc.waitFor()
+            println "${proc.exitValue()}"
+            println "${proc.in.text}"
+            println "${proc.err.text}"
         }
+    }
+
+    static def execProc(String cmd, String cwd) {
+        def processBuilder=new ProcessBuilder(cmd)
+        processBuilder.redirectErrorStream(true)
+        processBuilder.directory(new File(cwd))
+        processBuilder.start()
     }
 }
