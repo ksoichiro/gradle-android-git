@@ -15,6 +15,7 @@ class UpdateTask extends DefaultTask {
             println "  name: ${repo.name}"
             println "  libraryProject: ${repo.libraryProject}"
             println "  groupId: ${repo.groupId}"
+            println "  artifactId: ${repo.artifactId}"
             println "  commit: ${repo.commit}"
             println "  tag: ${repo.tag}"
             println "  gradleVersion: ${repo.gradleVersion}"

@@ -18,6 +18,7 @@ class GagPlugin implements Plugin<Project> {
                 println "  name: ${repo.name}"
                 println "  libraryProject: ${repo.libraryProject}"
                 println "  groupId: ${repo.groupId}"
+                println "  artifactId: ${repo.artifactId}"
                 println "  commit: ${repo.commit}"
                 println "  tag: ${repo.tag}"
                 println "  gradleVersion: ${repo.gradleVersion}"
@@ -51,16 +52,19 @@ class Dependencies {
             name = map["name"]
             libraryProject = map["libraryProject"]
             groupId = map["groupId"]
+            artifactId = map["artifactId"]
             commit = map["commit"]
             tag = map["tag"]
             gradleVersion = map["gradleVersion"]
         }
+        r.resolveVersion()
         repos.add(r)
     }
 
     void repo(Closure closure) {
         def r = new Repo()
         project.configure(r, closure)
+        r.resolveVersion()
         repos.add(r)
     }
 }
@@ -70,7 +74,17 @@ class Repo {
     String name
     String libraryProject
     String groupId
+    String artifactId
     String commit
     String tag
     String gradleVersion
+    String resolvedVersion
+
+    void resolveVersion() {
+        if (commit == null) {
+            resolvedVersion = tag
+        } else {
+            resolvedVersion = commit
+        }
+    }
 }
