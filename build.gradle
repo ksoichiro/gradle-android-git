@@ -5,6 +5,8 @@ apply plugin: 'signing'
 group = GROUP
 version = VERSION_NAME
 
+// To release:
+// ./gradlew clean release uploadArchive -Prelease
 def isReleaseBuild
 if (hasProperty("release")) {
     isReleaseBuild = true
@@ -20,6 +22,8 @@ if (isReleaseBuild) {
     sonatypeRepositoryUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
+// Note: These properties must be defined in ~/.gradle/gradle.properties
+// and signing.keyId, signing.password, signing.secretKeyRingFile, too.
 def username = project.getProperty("nexusUsername") ?: ""
 def password = project.getProperty("nexusPassword") ?: ""
 
@@ -40,42 +44,51 @@ install {
 
 afterEvaluate { project ->
     uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { deployment -> signing.signPom(deployment) }
+        if (isReleaseBuild) {
+            repositories {
+                mavenDeployer {
+                    beforeDeployment { deployment -> signing.signPom(deployment) }
 
-                repository(url: sonatypeRepositoryUrl) {
-                    authentication(userName: username, password: password)
+                    repository(url: sonatypeRepositoryUrl) {
+                        authentication(userName: username, password: password)
+                    }
+
+                    pom.project {
+                        name POM_NAME
+                        groupId GROUP
+                        description POM_DESCRIPTION
+                        url POM_URL
+                        inceptionYear '2014'
+
+                        scm {
+                            url POM_SCM_URL
+                            connection POM_SCM_CONNECTION
+                            developerConnection POM_SCM_DEV_CONNECTION
+                        }
+
+                        licenses {
+                            license {
+                                name POM_LICENSE_NAME
+                                url POM_LICENSE_URL
+                                distribution POM_LICENSE_DIST
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id POM_DEVELOPER_ID
+                                name POM_DEVELOPER_NAME
+                                url POM_DEVELOPER_URL
+                            }
+                        }
+                    }
                 }
-
-                pom.project {
-                    name POM_NAME
-                    groupId GROUP
-                    description POM_DESCRIPTION
-                    url POM_URL
-                    inceptionYear '2014'
-
-                    scm {
-                        url POM_SCM_URL
-                        connection POM_SCM_CONNECTION
-                        developerConnection POM_SCM_DEV_CONNECTION
-                    }
-
-                    licenses {
-                        license {
-                            name POM_LICENSE_NAME
-                            url POM_LICENSE_URL
-                            distribution POM_LICENSE_DIST
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id POM_DEVELOPER_ID
-                            name POM_DEVELOPER_NAME
-                            url POM_DEVELOPER_URL
-                        }
-                    }
+            }
+        } else {
+            // for development
+            repositories {
+                mavenDeployer {
+                    repository(url: uri('./samples/repo'))
                 }
             }
         }
