@@ -22,3 +22,4 @@ git {
     }
 }
 
+defaultTasks 'update'
