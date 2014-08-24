@@ -76,6 +76,7 @@ class UpdateTask extends DefaultTask {
         def libraryBuildGradle = project.file("${project.git.directory}/${repo.name}/${repo.libraryProject}/build.gradle")
         println libraryBuildGradle.path
         def relativeRepoPath = "../../.repo"
+        def version = repo.commit == null ? repo.tag : repo.commit
         libraryBuildGradle.append("""
 apply plugin: 'maven'
 
@@ -84,6 +85,7 @@ uploadArchives {
         mavenDeployer {
             repository(url: uri('${relativeRepoPath}'))
             pom.groupId = "${repo.groupId}"
+            pom.version = "${version}"
         }
     }
 }

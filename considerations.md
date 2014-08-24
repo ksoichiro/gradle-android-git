@@ -339,3 +339,82 @@ Total time: 4.881 secs
 Now we can notice that there are something to do before executing `./gradlew assemble`.
 
 Next question: what if there are updates in the library projects?
+
+## Experiment 3
+
+How about using commit hash or tag as a version number?
+
+e.g. `library/afe/androidformenhancer/build.gradle`
+
+```groovy
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('../../.repo'))
+            pom.groupId = "com.github.ksoichiro"
+            pom.version = "5a9492f45fd0f97289001a7398d04c59b846af40"
+        }
+    }
+}
+```
+
+`build.gradle` of app:
+
+```groovy
+dependencies {
+    compile 'com.android.support:support-v4:20.0.+'
+    compile 'com.github.ksoichiro:androidformenhancer:5a9492f45fd0f97289001a7398d04c59b846af40@aar'
+    compile 'com.github.ksoichiro:simplealertdialog:v1.1.1@aar'
+}
+```
+
+Above codes also worked well.
+
+When we need to update dependencies, update both `init.gradle` and `build.gradle`.  
+In the following codes, `AndroidFormEnhancer`'s commit hashes have been changes from `5a9492f45fd0f97289001a7398d04c59b846af40` to `a9d4496adee3aa79e118c8db9ddd4a0fff1c03d9`.
+
+`init.gradle`:
+
+```groovy
+git {
+    directory = "library"
+    dependencies {
+        // Use older version by commit hash (Detached HEAD)
+        repo location: 'https://github.com/ksoichiro/AndroidFormEnhancer.git', name: 'afe', libraryProject: 'androidformenhancer', groupId: 'com.github.ksoichiro', commit: 'a9d4496adee3aa79e118c8db9ddd4a0fff1c03d9'
+        // Use older version by tag (Detached HEAD)
+        repo location: 'https://github.com/ksoichiro/SimpleAlertDialog-for-Android.git', name: 'sad', libraryProject: 'simplealertdialog', groupId: 'com.github.ksoichiro', tag: 'v1.1.1'
+    }
+}
+```
+
+`build.gradle`:
+
+```groovy
+dependencies {
+    compile 'com.android.support:support-v4:20.0.+'
+    compile 'com.github.ksoichiro:androidformenhancer:a9d4496adee3aa79e118c8db9ddd4a0fff1c03d9@aar'
+    compile 'com.github.ksoichiro:simplealertdialog:v1.1.1@aar'
+}
+```
+
+With these codes and the local repo doesn't have the specified version aar, gradle can't resolve dependencies, which results in error.  
+So the team members can notice that they need to update dependencies.
+
+```sh
+$ ./gradlew assemble
+Relying on packaging to define the extension of the main artifact has been deprecated and is scheduled to be removed in Gradle 2.0
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring root project 'consumer'.
+> Could not resolve all dependencies for configuration ':_debugCompile'.
+   > Could not find com.github.ksoichiro:androidformenhancer:a9d4496adee3aa79e118c8db9ddd4a0fff1c03d9.
+     Required by:
+         :consumer:unspecified
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+
+BUILD FAILED
+```
