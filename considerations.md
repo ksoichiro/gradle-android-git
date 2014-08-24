@@ -2,6 +2,9 @@
 
 Considerations of design to make 'gag' a useful plugin.
 
+----
+## Sat. August 23, 2014
+
 ## Improvements
 
 What point does this tool improve?
@@ -56,8 +59,6 @@ $ ./gradlew assemble
 
 ### Configure with codes, not operations
 
-#### Ideal design
-
 All of the configurations to manage dependencies should be managed by codes.  
 Because people may forget to do some operations,  
 which causes unstable environment,  
@@ -76,24 +77,6 @@ $ ./gradlew assemble
 ```
 
 Initialization commands should be automatically executed when they are needed.
-
-#### Issue in the case of adopting the model(#7)
-
-Though initialization in separated command may be forgotten and not good in terms of the operations, it is necessary to do that because the job like `initGagDependencies` changes the structure of sub-projects, which must be re-evaluated by gradle. It means, it needs 2 build life-cycles and cannot be concatenated into 1 job.
-
-The bad point pointed at the above is the commands are separated and they need some judgements by users.  
-Users are forced to know when the commands should be executed and which command should be executed.
-
-If we clear that point, it's not so bad to separate commands.
-
-#### Auto-detect when to initialize/update sub-project
-
-Plugin should detect when to change the sub-projects' structure.
-In order to realize this, following actions must be executed.
-
-1. Save the states of sub-projects. (repository location, commit, tag, ...)
-1. Check if there are any differences of the states when the build command(`assemble` or `install`) is executed. (e.g. `commit` parameter in the `dependencies` closure has been changed)
-1. If something changed, abort the build commands and prompt users to execute initialization/updating command.
 
 ### Always update dependencies
 
@@ -133,6 +116,29 @@ Example:
 Without these steps, projects can't be built after checking out the root project repository.
 
 Perhaps the second of the above steps should be replaced to `git clone` or something.
+
+----
+## Sat. August 23, 2014
+
+## Workflow
+
+#### Issue in the case of adopting the model(#7)
+
+Though initialization in separated command may be forgotten and not good in terms of the operations, it is necessary to do that because the job like `initGagDependencies` changes the structure of sub-projects, which must be re-evaluated by gradle. It means, it needs 2 build life-cycles and cannot be concatenated into 1 job.
+
+The bad point pointed at the above is the commands are separated and they need some judgements by users.  
+Users are forced to know when the commands should be executed and which command should be executed.
+
+If we clear that point, it's not so bad to separate commands.
+
+#### Auto-detect when to initialize/update sub-project
+
+Plugin should detect when to change the sub-projects' structure.
+In order to realize this, following actions must be executed.
+
+1. Save the states of sub-projects. (repository location, commit, tag, ...)
+1. Check if there are any differences of the states when the build command(`assemble` or `install`) is executed. (e.g. `commit` parameter in the `dependencies` closure has been changed)
+1. If something changed, abort the build commands and prompt users to execute initialization/updating command.
 
 #### Issue of build life-cycle(#7)
 
