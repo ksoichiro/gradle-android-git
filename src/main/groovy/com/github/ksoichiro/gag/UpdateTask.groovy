@@ -1,10 +1,8 @@
 package com.github.ksoichiro.gag
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleScriptException
 import org.gradle.api.tasks.TaskAction
-
-import java.nio.file.Files
-import java.nio.file.Paths
 
 class UpdateTask extends DefaultTask {
     @TaskAction
@@ -29,21 +27,12 @@ class UpdateTask extends DefaultTask {
                 proc.waitFor()
                 if (proc.exitValue() == 0) {
                     println "  Completed successfully."
-                    println "  To use this dependency, you need some actions:"
-                    println "  * Add following lines to your `settings.gradle` in the root project directory."
-                    println ""
-                    println "      include ':${baseDir}:${repo.name}'"
-                    println ""
-                    println "  * Add the dependency description to your `build.gradle`."
-                    println ""
-                    println "      dependencies {"
-                    println "          compile project(':${baseDir}:${repo.name}')"
-                    println "      }"
-                    println ""
                 } else {
                     println "Failed to initialize. Check your configuration and network connection."
                     println "${proc.err.text}"
-                    // TODO Exit with error
+                    // Exit with error
+                    throw new GradleScriptException(
+                            "Failed to initialize. Check your configuration and network connection.", null)
                 }
             }
             checkout repo
@@ -56,7 +45,7 @@ class UpdateTask extends DefaultTask {
         def version = repo.commit == null ? repo.tag : repo.commit;
         def wd = new File("${project.git.directory}/${repo.name}")
 
-        def proc = execProc("git checkout master", wd)
+        def proc = execProc("git checkout -f master", wd)
         proc.waitFor()
 
         proc = execProc("git fetch", wd)
@@ -95,13 +84,11 @@ uploadArchives {
 }
 """)
 
-        println "Detecting OS type..."
         def gradle = "./gradlew"
         def osName = System.getProperty("os.name").toLowerCase()
         if (osName.contains("windows")) {
             gradle = "gradlew.bat"
         }
-        println osName
         if (!(new File(wd, gradle)).exists()) {
             println "Gradle wrapper not found. Generating..."
 
@@ -109,28 +96,29 @@ uploadArchives {
             def tmpDir = ".tmp"
             project.file(tmpDir).mkdirs()
             if (repo.gradleVersion != null) {
-                project.file(tmpDir.toString()+"/build.gradle").write("""
+                project.file(tmpDir.toString() + "/build.gradle").write("""
 task wrapper(type: Wrapper) {
     gradleVersion = '${repo.gradleVersion}'
 }
 """)
             }
             def pb = new ProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"])
-                    .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                    .redirectInput(ProcessBuilder.Redirect.INHERIT)
-                    .redirectError(ProcessBuilder.Redirect.INHERIT)
+            // .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+            // .redirectInput(ProcessBuilder.Redirect.INHERIT)
+            // .redirectError(ProcessBuilder.Redirect.INHERIT)
                     .directory(project.projectDir)
             def env = pb.environment()
             env["PATH"] = System.getenv("PATH")
             def proc = pb.start()
             proc.waitFor()
 
+            // Copy generated gradle wrapper to library directory
             project.copy {
                 from new File(tmpDir, "gradle").path
                 into new File(wd, "gradle").path
             }
             project.copy {
-                from (tmpDir) {
+                from(tmpDir) {
                     include 'gradlew*'
                 }
                 into wd.path
@@ -138,13 +126,13 @@ task wrapper(type: Wrapper) {
             project.delete(tmpDir)
         }
 
+        println "Assembling and uploading library ${repo.name}..."
         def gradleCommand = [
                 "${gradle}".toString(),
                 ":${repo.libraryProject}:clean".toString(),
                 ":${repo.libraryProject}:assemble".toString(),
                 ":${repo.libraryProject}:uploadArchives".toString()
         ]
-        println "Executing library gradle"
         def pb = new ProcessBuilder(gradleCommand)
                 .redirectOutput(ProcessBuilder.Redirect.INHERIT)
                 .redirectInput(ProcessBuilder.Redirect.INHERIT)
