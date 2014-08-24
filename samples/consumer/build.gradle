@@ -1,46 +1,13 @@
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url uri('../repo')
-        }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
-        classpath 'com.github.ksoichiro:gradle-android-git:0.1.+'
     }
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'gag'
-
-// To test applying 'gag' plugin:
-// $ cd /path/to/gradle-android-git
-// $ ./gradlew uploadArchives
-// $ cd samples/consumer/
-// $ gradle -q joke
-
-// This insert the 'update' task before build android app.
-preBuild.dependsOn {
-    update
-}
-
-git {
-    directory = "library"
-    dependencies {
-        // Use older version by commit hash (Detached HEAD)
-        repo location: 'https://github.com/ksoichiro/AndroidFormEnhancer.git', name: 'afe', commit: '5a9492f45fd0f97289001a7398d04c59b846af40'
-        // Use older version by tag (Detached HEAD)
-        repo location: 'https://github.com/ksoichiro/SimpleAlertDialog-for-Android.git', name: 'sad', tag: 'v1.1.1'
-    }
-}
-
-// To test applying 'gag' plugin with 'com.android.application':
-// $ cd /path/to/gradle-android-git
-// $ ./gradlew uploadArchives
-// $ cd samples/consumer/
-// $ gradle assemble
-// Then you can see :joke task is executed before :preBuild
 
 android {
     compileSdkVersion 19
@@ -50,8 +17,14 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url uri('library/.repo')
+    }
+}
+
 dependencies {
     compile 'com.android.support:support-v4:20.0.+'
-    compile project(':library:afe:androidformenhancer')
-    compile project(':library:sad:simplealertdialog')
+    compile 'com.github.ksoichiro:androidformenhancer:1.1.0@aar'
+    compile 'com.github.ksoichiro:simplealertdialog:1.1.1@aar'
 }

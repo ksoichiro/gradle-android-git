@@ -16,6 +16,8 @@ class GagPlugin implements Plugin<Project> {
                 println "dependency:"
                 println "  location: ${repo.location}"
                 println "  name: ${repo.name}"
+                println "  libraryProject: ${repo.libraryProject}"
+                println "  groupId: ${repo.groupId}"
                 println "  commit: ${repo.commit}"
                 println "  tag: ${repo.tag}"
             }
@@ -46,6 +48,8 @@ class Dependencies {
         project.configure(r) {
             location = map["location"]
             name = map["name"]
+            libraryProject = map["libraryProject"]
+            groupId = map["groupId"]
             commit = map["commit"]
             tag = map["tag"]
         }
@@ -62,6 +66,8 @@ class Dependencies {
 class Repo {
     String location
     String name
+    String libraryProject
+    String groupId
     String commit
     String tag
 }

@@ -231,3 +231,111 @@ dependencies {
 * `gradlew` should be launched as a sub-process of the plugin. The plugin doesn't know if there are `gradlew` files or which should be executed(`gradlew` and `gradlew.bat`).
 * Detecting OS may be [possible](http://stackoverflow.com/questions/11235614/how-to-detect-the-current-os-from-gradle).
 * The next question is: does these mechanisms work immediately after checking out the app project?
+
+----
+
+## Experiment 2
+
+Because of gradle trying to resolve all the dependencies written in `build.gradle`, we cannot put dependency initialization configuration and building app configuration together.
+
+Initialize with another gradle file `init.gradle` may be a solution.
+
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+        // for testing plugin
+        maven {
+            url uri('../repo')
+        }
+    }
+    dependencies {
+        classpath 'com.github.ksoichiro:gradle-android-git:0.1.+'
+    }
+}
+
+apply plugin: 'gag'
+
+git {
+    directory = "library"
+    dependencies {
+        // Use older version by commit hash (Detached HEAD)
+        repo location: 'https://github.com/ksoichiro/AndroidFormEnhancer.git', name: 'afe', libraryProject: 'androidformenhancer', groupId: 'com.github.ksoichiro', commit: '5a9492f45fd0f97289001a7398d04c59b846af40'
+        // Use older version by tag (Detached HEAD)
+        repo location: 'https://github.com/ksoichiro/SimpleAlertDialog-for-Android.git', name: 'sad', libraryProject: 'simplealertdialog', groupId: 'com.github.ksoichiro', tag: 'v1.1.1'
+    }
+}
+```
+
+And `build.gradle` is simple:
+
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.12.+'
+    }
+}
+
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.1.0"
+    defaultConfig {
+        minSdkVersion 8
+    }
+}
+
+// Refer to Maven repo created by gag
+repositories {
+    maven {
+        url uri('library/.repo')
+    }
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:20.0.+'
+    compile 'com.github.ksoichiro:androidformenhancer:1.1.0@aar'
+    compile 'com.github.ksoichiro:simplealertdialog:1.1.1@aar'
+}
+```
+
+Then do this:
+
+```sh
+$ ./gradlew -b init.gradle update
+$ ./gradlew clean assemble
+```
+
+Without initialize command:
+
+```sh
+$ ./gradlew assemble
+Relying on packaging to define the extension of the main artifact has been deprecated and is scheduled to be removed in Gradle 2.0
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+A problem occurred configuring root project 'consumer'.
+> Could not resolve all dependencies for configuration ':_debugCompile'.
+   > Could not find com.github.ksoichiro:androidformenhancer:1.1.0.
+     Required by:
+         :consumer:unspecified
+   > Could not find com.github.ksoichiro:simplealertdialog:1.1.1.
+     Required by:
+         :consumer:unspecified
+
+* Try:
+Run with --stacktrace option to get the stack trace. Run with --info or --debug option to get more log output.
+
+BUILD FAILED
+
+Total time: 4.881 secs
+```
+
+Now we can notice that there are something to do before executing `./gradlew assemble`.
+
+Next question: what if there are updates in the library projects?

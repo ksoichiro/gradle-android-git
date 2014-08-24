@@ -12,6 +12,8 @@ class UpdateTask extends DefaultTask {
             println "dependency:"
             println "  location: ${repo.location}"
             println "  name: ${repo.name}"
+            println "  libraryProject: ${repo.libraryProject}"
+            println "  groupId: ${repo.groupId}"
             println "  commit: ${repo.commit}"
             println "  tag: ${repo.tag}"
             def repoDir = project.file(baseDir + '/' + repo.name)
@@ -41,6 +43,7 @@ class UpdateTask extends DefaultTask {
                 }
             }
             checkout repo
+            uploadArchives repo
         }
         println "Done. Please put `${baseDir}/` to your .gitignore."
     }
@@ -63,6 +66,56 @@ class UpdateTask extends DefaultTask {
             proc = execProc("git checkout -f ${version}", wd)
             proc.waitFor()
         }
+    }
+
+    def uploadArchives(Repo repo) {
+        def wd = new File("${project.git.directory}/${repo.name}")
+
+        // Append uploadArchives command
+        println "Appending upload command to build.gradle..."
+        def libraryBuildGradle = project.file("${project.git.directory}/${repo.name}/${repo.libraryProject}/build.gradle")
+        println libraryBuildGradle.path
+        def relativeRepoPath = "../../.repo"
+        libraryBuildGradle.append("""
+apply plugin: 'maven'
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: uri('${relativeRepoPath}'))
+            pom.groupId = "${repo.groupId}"
+        }
+    }
+}
+""")
+
+        println "Detecting OS type..."
+        def gradle = "./gradlew"
+        def osName = System.getProperty("os.name").toLowerCase()
+        if (osName.contains("windows")) {
+            gradle = "gradlew.bat"
+        }
+        println osName
+
+        def gradleCommand = [
+                "${gradle}".toString(),
+                ":${repo.libraryProject}:clean".toString(),
+                ":${repo.libraryProject}:assemble".toString(),
+                ":${repo.libraryProject}:uploadArchives".toString()
+        ]
+        println "Executing library gradle"
+        def pb = new ProcessBuilder(gradleCommand)
+                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                .redirectError(ProcessBuilder.Redirect.INHERIT)
+                .directory(wd)
+        def env = pb.environment()
+        env["PATH"] = System.getenv("PATH")
+        def proc = pb.start()
+        proc.waitFor()
+        println "Exit value: ${proc.exitValue()}"
+        println "${proc.in.text}"
+        println "${proc.err.text}"
     }
 
     static def execProc(String cmd, File cwd) {
