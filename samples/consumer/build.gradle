@@ -19,12 +19,12 @@ android {
 
 repositories {
     maven {
-        url uri('library/.repo')
+        url uri('.gag/.repo')
     }
 }
 
 dependencies {
     compile 'com.android.support:support-v4:20.0.+'
-    compile 'com.github.ksoichiro:androidformenhancer:1.1.0@aar'
-    compile 'com.github.ksoichiro:simplealertdialog:1.1.1@aar'
+    compile 'com.github.ksoichiro:androidformenhancer:5a9492f45fd0f97289001a7398d04c59b846af40@aar'
+    compile 'com.github.ksoichiro:simplealertdialog:v1.1.1@aar'
 }

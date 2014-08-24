@@ -4,3 +4,4 @@ build/
 *.swp
 *.iml
 local.properties
+.gag/

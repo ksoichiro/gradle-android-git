@@ -13,7 +13,7 @@ buildscript {
 apply plugin: 'gag'
 
 git {
-    directory = "library"
+    directory = ".gag"
     dependencies {
         // Use older version by commit hash (Detached HEAD)
         repo location: 'https://github.com/ksoichiro/AndroidFormEnhancer.git', name: 'afe', libraryProject: 'androidformenhancer', groupId: 'com.github.ksoichiro', commit: '5a9492f45fd0f97289001a7398d04c59b846af40'
