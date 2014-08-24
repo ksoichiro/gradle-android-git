@@ -58,7 +58,7 @@ git {
     // Local library directories. ".gag" is default
     directory = ".gag"
 
-    dependencies {
+    gitDependencies {
         // Use older version by commit hash (Detached HEAD)
         repo location: 'https://github.com/ksoichiro/AndroidFormEnhancer.git', name: 'afe', libraryProject: 'androidformenhancer', groupId: 'com.github.ksoichiro', commit: '5a9492f45fd0f97289001a7398d04c59b846af40'
 

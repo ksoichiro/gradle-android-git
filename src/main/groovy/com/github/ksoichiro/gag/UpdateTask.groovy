@@ -9,7 +9,7 @@ class UpdateTask extends DefaultTask {
     def exec() {
         def baseDir = project.git.directory
         println "Dependencies managed by gag:"
-        project.git.dependencies.repos.each() { Repo repo ->
+        project.git.gitDependencies.repos.each() { Repo repo ->
             println "dependency:"
             println "  location: ${repo.location}"
             println "  name: ${repo.name}"
