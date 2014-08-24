@@ -22,9 +22,6 @@ in your Android app build process.
 
 ## Usage
 
-This plugin works in your local environment, but not released to `mavenCentral` nor `jcenter` yet.  
-Please build this plugin and `uploadArchive` to your local repository.
-
 To use this plugin:
 
 1. Create your `gag.gradle` and execute `update` (see "Setting up gag.gradle" section below)
@@ -42,12 +39,11 @@ buildscript {
     repositories {
         mavenCentral()
         maven {
-            // Currently, gag is not provided on mavenCentral()
-            url uri('../repo')
+            url uri('https://oss.sonatype.org/service/local/repositories/releases/content/')
         }
     }
     dependencies {
-        classpath 'com.github.ksoichiro:gradle-android-git:0.1.+'
+        classpath 'com.github.ksoichiro:gradle-android-git:0.1.1'
     }
 }
 
