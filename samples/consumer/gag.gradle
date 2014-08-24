@@ -19,6 +19,14 @@ git {
         repo location: 'https://github.com/ksoichiro/AndroidFormEnhancer.git', name: 'afe', libraryProject: 'androidformenhancer', groupId: 'com.github.ksoichiro', commit: '5a9492f45fd0f97289001a7398d04c59b846af40'
         // Use older version by tag (Detached HEAD)
         repo location: 'https://github.com/ksoichiro/SimpleAlertDialog-for-Android.git', name: 'sad', libraryProject: 'simplealertdialog', groupId: 'com.github.ksoichiro', tag: 'v1.1.1'
+        repo {
+            location = 'https://github.com/JakeWharton/ActionBarSherlock.git'
+            name = 'abs'
+            libraryProject = 'actionbarsherlock'
+            groupId = 'com.actionbarsherlock'
+            commit = '4a79d536af872339899a90d6dc743aa57745474b'
+            gradleVersion = '1.6'
+        }
     }
 }
 

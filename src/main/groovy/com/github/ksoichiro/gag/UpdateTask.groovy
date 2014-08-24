@@ -3,6 +3,9 @@ package com.github.ksoichiro.gag
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 
+import java.nio.file.Files
+import java.nio.file.Paths
+
 class UpdateTask extends DefaultTask {
     @TaskAction
     def exec() {
@@ -16,6 +19,7 @@ class UpdateTask extends DefaultTask {
             println "  groupId: ${repo.groupId}"
             println "  commit: ${repo.commit}"
             println "  tag: ${repo.tag}"
+            println "  gradleVersion: ${repo.gradleVersion}"
             def repoDir = project.file(baseDir + '/' + repo.name)
             if (!repoDir.exists()) {
                 // This is the first time, so we clone
@@ -98,6 +102,41 @@ uploadArchives {
             gradle = "gradlew.bat"
         }
         println osName
+        if (!(new File(wd, gradle)).exists()) {
+            println "Gradle wrapper not found. Generating..."
+
+            // Generating wrapper to temporary directory
+            def tmpDir = ".tmp"
+            project.file(tmpDir).mkdirs()
+            if (repo.gradleVersion != null) {
+                project.file(tmpDir.toString()+"/build.gradle").write("""
+task wrapper(type: Wrapper) {
+    gradleVersion = '${repo.gradleVersion}'
+}
+""")
+            }
+            def pb = new ProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"])
+                    .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+                    .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                    .redirectError(ProcessBuilder.Redirect.INHERIT)
+                    .directory(project.projectDir)
+            def env = pb.environment()
+            env["PATH"] = System.getenv("PATH")
+            def proc = pb.start()
+            proc.waitFor()
+
+            project.copy {
+                from new File(tmpDir, "gradle").path
+                into new File(wd, "gradle").path
+            }
+            project.copy {
+                from (tmpDir) {
+                    include 'gradlew*'
+                }
+                into wd.path
+            }
+            project.delete(tmpDir)
+        }
 
         def gradleCommand = [
                 "${gradle}".toString(),

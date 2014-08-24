@@ -27,4 +27,5 @@ dependencies {
     compile 'com.android.support:support-v4:20.0.+'
     compile 'com.github.ksoichiro:androidformenhancer:5a9492f45fd0f97289001a7398d04c59b846af40@aar'
     compile 'com.github.ksoichiro:simplealertdialog:v1.1.1@aar'
+    compile 'com.actionbarsherlock:actionbarsherlock:4a79d536af872339899a90d6dc743aa57745474b@aar'
 }
