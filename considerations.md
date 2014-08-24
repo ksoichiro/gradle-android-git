@@ -418,3 +418,19 @@ Run with --stacktrace option to get the stack trace. Run with --info or --debug 
 
 BUILD FAILED
 ```
+
+### Updating dependencies' version
+
+If we see the error above, just execute a command below:
+
+```sh
+$ ./gradlew -b init.gradle update
+```
+
+If `init.gradle` is properly configured, the specified version will be installed to local repo(`library/.repo`).
+
+Then, build again:
+
+```sh
+$ ./gradlew assemble
+```
