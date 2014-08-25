@@ -9,8 +9,7 @@ class StreamGobbler extends Thread {
     }
 
     public void run() {
-        String line
-        while ((line = reader.readLine()) != null) {
+        while (reader.readLine() != null) {
             // Just drop contents
         }
     }
