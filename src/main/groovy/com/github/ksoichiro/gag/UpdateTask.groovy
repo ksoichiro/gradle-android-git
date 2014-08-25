@@ -103,15 +103,7 @@ task wrapper(type: Wrapper) {
 }
 """)
             }
-            def pb = new ProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"])
-            // .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-            // .redirectInput(ProcessBuilder.Redirect.INHERIT)
-            // .redirectError(ProcessBuilder.Redirect.INHERIT)
-                    .directory(project.projectDir)
-            def env = pb.environment()
-            env["PATH"] = System.getenv("PATH")
-            def proc = pb.start()
-            proc.waitFor()
+            execProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"], project.projectDir)
 
             // Copy generated gradle wrapper to library directory
             project.copy {
@@ -134,15 +126,7 @@ task wrapper(type: Wrapper) {
                 ":${repo.libraryProject}:assemble".toString(),
                 ":${repo.libraryProject}:uploadArchives".toString()
         ]
-        def pb = new ProcessBuilder(gradleCommand)
-        // .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        // .redirectInput(ProcessBuilder.Redirect.INHERIT)
-        // .redirectError(ProcessBuilder.Redirect.INHERIT)
-                .directory(wd)
-        def env = pb.environment()
-        env["PATH"] = System.getenv("PATH")
-        def proc = pb.start()
-        proc.waitFor()
+        def proc = execProcessBuilder(gradleCommand, wd)
         println "Exit value: ${proc.exitValue()}"
         println "${proc.in.text}"
         println "${proc.err.text}"
@@ -150,5 +134,23 @@ task wrapper(type: Wrapper) {
 
     static def execProc(String cmd, File cwd) {
         cmd.execute([], cwd)
+    }
+
+    static def execProcessBuilder(List<String> gradleCommand, File wd) {
+        def pb = new ProcessBuilder(gradleCommand)
+                .directory(wd)
+        def env = pb.environment()
+        env["PATH"] = System.getenv("PATH")
+        def proc = pb.start()
+
+        // Avoid I/O blocking
+        def inGobbler = new StreamGobbler(proc.getInputStream())
+        def errGobbler = new StreamGobbler(proc.getErrorStream())
+        inGobbler.start()
+        errGobbler.start()
+        proc.waitFor()
+        inGobbler.join()
+        errGobbler.join()
+        proc
     }
 }
