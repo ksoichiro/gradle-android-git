@@ -135,9 +135,9 @@ task wrapper(type: Wrapper) {
                 ":${repo.libraryProject}:uploadArchives".toString()
         ]
         def pb = new ProcessBuilder(gradleCommand)
-                .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-                .redirectInput(ProcessBuilder.Redirect.INHERIT)
-                .redirectError(ProcessBuilder.Redirect.INHERIT)
+        // .redirectOutput(ProcessBuilder.Redirect.INHERIT)
+        // .redirectInput(ProcessBuilder.Redirect.INHERIT)
+        // .redirectError(ProcessBuilder.Redirect.INHERIT)
                 .directory(wd)
         def env = pb.environment()
         env["PATH"] = System.getenv("PATH")
