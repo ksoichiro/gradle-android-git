@@ -46,19 +46,13 @@ class UpdateTask extends DefaultTask {
         def version = repo.commit == null ? repo.tag : repo.commit;
         def wd = new File("${project.git.directory}/${repo.name}")
 
-        def proc = execProc("git checkout -f master", wd)
-        proc.waitFor()
-
-        proc = execProc("git fetch", wd)
-        proc.waitFor()
-
-        proc = execProc("git pull origin master", wd)
-        proc.waitFor()
+        execProcessBuilder(["git", "checkout", "-f", "master"], wd, "git")
+        execProcessBuilder(["git", "fetch"], wd, "git")
+        execProcessBuilder(["git", "pull", "origin", "master"], wd, "git")
 
         if (version != null) {
             println "Switch to ${version}..."
-            proc = execProc("git checkout -f ${version}", wd)
-            proc.waitFor()
+            execProcessBuilder(["git", "checkout", "-f", "${version}".toString()], wd, "git")
         }
     }
 
@@ -103,15 +97,7 @@ task wrapper(type: Wrapper) {
 }
 """)
             }
-            def pb = new ProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"])
-            // .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-            // .redirectInput(ProcessBuilder.Redirect.INHERIT)
-            // .redirectError(ProcessBuilder.Redirect.INHERIT)
-                    .directory(project.projectDir)
-            def env = pb.environment()
-            env["PATH"] = System.getenv("PATH")
-            def proc = pb.start()
-            proc.waitFor()
+            execProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"], project.projectDir, "gradlew")
 
             // Copy generated gradle wrapper to library directory
             project.copy {
@@ -134,21 +120,27 @@ task wrapper(type: Wrapper) {
                 ":${repo.libraryProject}:assemble".toString(),
                 ":${repo.libraryProject}:uploadArchives".toString()
         ]
-        def pb = new ProcessBuilder(gradleCommand)
-        // .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-        // .redirectInput(ProcessBuilder.Redirect.INHERIT)
-        // .redirectError(ProcessBuilder.Redirect.INHERIT)
-                .directory(wd)
-        def env = pb.environment()
-        env["PATH"] = System.getenv("PATH")
-        def proc = pb.start()
-        proc.waitFor()
+        def proc = execProcessBuilder(gradleCommand, wd, "gradlew")
         println "Exit value: ${proc.exitValue()}"
         println "${proc.in.text}"
         println "${proc.err.text}"
     }
 
-    static def execProc(String cmd, File cwd) {
-        cmd.execute([], cwd)
+    static def execProcessBuilder(List<String> gradleCommand, File wd, def tag) {
+        def pb = new ProcessBuilder(gradleCommand)
+                .directory(wd)
+        def env = pb.environment()
+        env["PATH"] = System.getenv("PATH")
+        def proc = pb.start()
+
+        // Avoid I/O blocking
+        def inGobbler = new StreamGobbler(proc.getInputStream(), "${tag}:in")
+        def errGobbler = new StreamGobbler(proc.getErrorStream(), "${tag}:err")
+        inGobbler.start()
+        errGobbler.start()
+        proc.waitFor()
+        inGobbler.join()
+        errGobbler.join()
+        proc
     }
 }
