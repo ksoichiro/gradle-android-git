@@ -46,19 +46,13 @@ class UpdateTask extends DefaultTask {
         def version = repo.commit == null ? repo.tag : repo.commit;
         def wd = new File("${project.git.directory}/${repo.name}")
 
-        def proc = execProc("git checkout -f master", wd)
-        proc.waitFor()
-
-        proc = execProc("git fetch", wd)
-        proc.waitFor()
-
-        proc = execProc("git pull origin master", wd)
-        proc.waitFor()
+        execProcessBuilder(["git", "checkout", "-f", "master"], wd)
+        execProcessBuilder(["git", "fetch"], wd)
+        execProcessBuilder(["git", "pull", "origin", "master"], wd)
 
         if (version != null) {
             println "Switch to ${version}..."
-            proc = execProc("git checkout -f ${version}", wd)
-            proc.waitFor()
+            execProcessBuilder(["git", "checkout", "-f", "${version}".toString()], wd)
         }
     }
 
@@ -130,10 +124,6 @@ task wrapper(type: Wrapper) {
         println "Exit value: ${proc.exitValue()}"
         println "${proc.in.text}"
         println "${proc.err.text}"
-    }
-
-    static def execProc(String cmd, File cwd) {
-        cmd.execute([], cwd)
     }
 
     static def execProcessBuilder(List<String> gradleCommand, File wd) {
