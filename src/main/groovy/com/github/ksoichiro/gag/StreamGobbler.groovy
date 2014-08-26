@@ -9,8 +9,11 @@ class StreamGobbler extends Thread {
     }
 
     public void run() {
-        while (reader.readLine() != null) {
+        // String s causes NoClassDefFoundException for ShortTypeHandling
+        def s
+        while ((s = this.reader.readLine()) != null) {
             // Just drop contents
+            println(s)
         }
     }
 
