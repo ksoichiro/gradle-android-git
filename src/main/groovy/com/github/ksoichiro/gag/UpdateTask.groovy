@@ -46,13 +46,13 @@ class UpdateTask extends DefaultTask {
         def version = repo.commit == null ? repo.tag : repo.commit;
         def wd = new File("${project.git.directory}/${repo.name}")
 
-        execProcessBuilder(["git", "checkout", "-f", "master"], wd)
-        execProcessBuilder(["git", "fetch"], wd)
-        execProcessBuilder(["git", "pull", "origin", "master"], wd)
+        execProcessBuilder(["git", "checkout", "-f", "master"], wd, "git")
+        execProcessBuilder(["git", "fetch"], wd, "git")
+        execProcessBuilder(["git", "pull", "origin", "master"], wd, "git")
 
         if (version != null) {
             println "Switch to ${version}..."
-            execProcessBuilder(["git", "checkout", "-f", "${version}".toString()], wd)
+            execProcessBuilder(["git", "checkout", "-f", "${version}".toString()], wd, "git")
         }
     }
 
@@ -97,7 +97,7 @@ task wrapper(type: Wrapper) {
 }
 """)
             }
-            execProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"], project.projectDir)
+            execProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"], project.projectDir, "gradlew")
 
             // Copy generated gradle wrapper to library directory
             project.copy {
@@ -120,13 +120,13 @@ task wrapper(type: Wrapper) {
                 ":${repo.libraryProject}:assemble".toString(),
                 ":${repo.libraryProject}:uploadArchives".toString()
         ]
-        def proc = execProcessBuilder(gradleCommand, wd)
+        def proc = execProcessBuilder(gradleCommand, wd, "gradlew")
         println "Exit value: ${proc.exitValue()}"
         println "${proc.in.text}"
         println "${proc.err.text}"
     }
 
-    static def execProcessBuilder(List<String> gradleCommand, File wd) {
+    static def execProcessBuilder(List<String> gradleCommand, File wd, def tag) {
         def pb = new ProcessBuilder(gradleCommand)
                 .directory(wd)
         def env = pb.environment()
@@ -134,8 +134,8 @@ task wrapper(type: Wrapper) {
         def proc = pb.start()
 
         // Avoid I/O blocking
-        def inGobbler = new StreamGobbler(proc.getInputStream())
-        def errGobbler = new StreamGobbler(proc.getErrorStream())
+        def inGobbler = new StreamGobbler(proc.getInputStream(), "${tag}:in")
+        def errGobbler = new StreamGobbler(proc.getErrorStream(), "${tag}:err")
         inGobbler.start()
         errGobbler.start()
         proc.waitFor()
