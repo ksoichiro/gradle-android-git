@@ -19,6 +19,7 @@ class GagPlugin implements Plugin<Project> {
                 println "  libraryProject: ${repo.libraryProject}"
                 println "  groupId: ${repo.groupId}"
                 println "  artifactId: ${repo.artifactId}"
+                println "  branch: ${repo.branch}"
                 println "  commit: ${repo.commit}"
                 println "  tag: ${repo.tag}"
                 println "  gradleVersion: ${repo.gradleVersion}"
@@ -53,6 +54,7 @@ class Dependencies {
             libraryProject = map["libraryProject"]
             groupId = map["groupId"]
             artifactId = map["artifactId"]
+            branch = map["branch"]
             commit = map["commit"]
             tag = map["tag"]
             gradleVersion = map["gradleVersion"]
@@ -75,6 +77,7 @@ class Repo {
     String libraryProject
     String groupId
     String artifactId
+    String branch = "master"
     String commit
     String tag
     String gradleVersion

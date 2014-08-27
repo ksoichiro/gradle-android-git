@@ -16,6 +16,7 @@ class UpdateTask extends DefaultTask {
             println "  libraryProject: ${repo.libraryProject}"
             println "  groupId: ${repo.groupId}"
             println "  artifactId: ${repo.artifactId}"
+            println "  branch: ${repo.branch}"
             println "  commit: ${repo.commit}"
             println "  tag: ${repo.tag}"
             println "  gradleVersion: ${repo.gradleVersion}"
@@ -46,9 +47,13 @@ class UpdateTask extends DefaultTask {
         def version = repo.commit == null ? repo.tag : repo.commit;
         def wd = new File("${project.git.directory}/${repo.name}")
 
-        execProcessBuilder(["git", "checkout", "-f", "master"], wd, "git")
+        def branch = repo.branch
+        if (branch == null || branch.length() == 0) {
+            branch = "master"
+        }
+        execProcessBuilder(["git", "checkout", "-f", branch], wd, "git")
         execProcessBuilder(["git", "fetch"], wd, "git")
-        execProcessBuilder(["git", "pull", "origin", "master"], wd, "git")
+        execProcessBuilder(["git", "pull", "origin", branch], wd, "git")
 
         if (version != null) {
             println "Switch to ${version}..."
