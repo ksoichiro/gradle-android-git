@@ -167,6 +167,64 @@ or
 $ ./gradlew -b gag.gradle update
 ```
 
+## Configuration
+
+### git
+
+`git` closure is the main configuration.  
+This defines dependencies (and other meta data in the future).
+
+### gitDependencies
+
+`gitDependencies` includes Git repositories definition.  
+This is also a closure.
+
+### repo
+
+`repo` is the Git repository configuration.  
+Each parameters will be passed to git command, so local path and remote URL will be resolved.
+
+#### location
+
+Repository location.  
+This can be a local file path, remote git URL, or whatever `git` can recognize.
+
+#### name
+
+Name of the dependency.  
+The dependency is cloned with this name.
+
+#### libraryProject
+
+The name of the Android library sub-project in the repository.
+
+#### groupId
+
+Maven `groupId`.  
+This is not the public `groupId`.  
+You can use anything if it doesn't conflict with your other dependencies.
+
+#### artifactId
+
+Maven `artifactId`.
+Its meaning is the same as the `groupId`.  
+It's not necessary to match to the public `artifactId`.
+
+#### branch
+
+Default value is `master`.
+
+#### commit / tag
+
+Target version identified with commit or tag.  
+
+#### gradleVersion
+
+Gradle wrapper version to build Android library project.  
+This parameter is only used when the target dependency repository doesn't include gradle wrapper.
+
+To generate wrapper, gag uses host project's gradle wrapper.
+
 ## Samples
 
 See `samples/consumer` directory.  
