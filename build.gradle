@@ -38,7 +38,7 @@ repositories {
 
 install {
     repositories.mavenInstaller {
-        pom.artifactId = 'gradle-android-git'
+        pom.artifactId = POM_ARTIFACT_ID
     }
 }
 
@@ -58,7 +58,7 @@ afterEvaluate { project ->
                         groupId GROUP
                         description POM_DESCRIPTION
                         url POM_URL
-                        inceptionYear '2014'
+                        inceptionYear POM_INCEPTION_YEAR
 
                         scm {
                             url POM_SCM_URL
