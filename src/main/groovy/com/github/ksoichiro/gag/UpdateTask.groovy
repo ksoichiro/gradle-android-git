@@ -90,7 +90,8 @@ uploadArchives {
             gradle = "gradlew.bat"
         }
         if (!(new File(wd, gradle)).exists()) {
-            println "Gradle wrapper not found. Generating..."
+            def versionStr = repo.gradleVersion == null ? "" : " ${repo.gradleVersion}"
+            println "Gradle wrapper not found. Generating${versionStr}..."
 
             // Generating wrapper to temporary directory
             def tmpDir = ".tmp"
