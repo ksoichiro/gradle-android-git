@@ -6,7 +6,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.github.ksoichiro:gradle-android-git:0.1.+'
+        classpath 'com.github.ksoichiro:gradle-android-git:0.1.6-SNAPSHOT'
     }
 }
 
