@@ -1,0 +1,9 @@
+language: groovy
+
+jdk:
+  - openjdk6
+  - openjdk7
+
+script:
+  - ./gradlew clean assemble test uploadArchives
+  - cd samples/consumer && ./gradlew -b gag.gradle
