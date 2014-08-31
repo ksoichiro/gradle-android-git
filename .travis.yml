@@ -6,4 +6,6 @@ jdk:
 
 script:
   - ./gradlew clean assemble test uploadArchives
-  - cd samples/consumer && ./gradlew -b gag.gradle
+  # This will compile Android projects which needs Android SDK.
+  # It makes tests so slow, so disables it.
+  #- cd samples/consumer && ./gradlew -b gag.gradle
