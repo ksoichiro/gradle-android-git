@@ -44,20 +44,35 @@ class UpdateTask extends DefaultTask {
     }
 
     def checkout(Repo repo) {
-        def version = repo.commit == null ? repo.tag : repo.commit;
         def wd = new File("${project.git.directory}/${repo.name}")
 
         def branch = repo.branch
         if (branch == null || branch.length() == 0) {
             branch = "master"
         }
-        execProcessBuilder(["git", "checkout", "-f", branch], wd, "git")
-        execProcessBuilder(["git", "fetch"], wd, "git")
-        execProcessBuilder(["git", "pull", "origin", branch], wd, "git")
+        def proc = execProcessBuilder(["git", "checkout", "-f", branch], wd, "git")
+        if (proc.exitValue() != 0) {
+            throw new GradleScriptException(
+                    "Failed to checkout target branch", null)
+        }
+        proc = execProcessBuilder(["git", "fetch"], wd, "git")
+        if (proc.exitValue() != 0) {
+            throw new GradleScriptException(
+                    "Failed to fetch from remote", null)
+        }
+        proc = execProcessBuilder(["git", "pull", "origin", branch], wd, "git")
+        if (proc.exitValue() != 0) {
+            throw new GradleScriptException(
+                    "Failed to pull", null)
+        }
 
-        if (version != null) {
-            println "Switch to ${version}..."
-            execProcessBuilder(["git", "checkout", "-f", "${version}".toString()], wd, "git")
+        if (repo.resolvedVersion != null) {
+            println "Switch to ${repo.resolvedVersion}..."
+            proc = execProcessBuilder(["git", "checkout", "-f", "${repo.resolvedVersion}".toString()], wd, "git")
+            if (proc.exitValue() != 0) {
+                throw new GradleScriptException(
+                        "Failed to checkout target version/tag", null)
+            }
         }
     }
 
@@ -103,7 +118,11 @@ task wrapper(type: Wrapper) {
 }
 """)
             }
-            execProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"], project.projectDir, "gradlew")
+            def proc = execProcessBuilder([gradle.toString(), "-p", tmpDir, "wrapper"], project.projectDir, "gradlew")
+            if (proc.exitValue() != 0) {
+                throw new GradleScriptException(
+                        "Failed to generate wrapper", null)
+            }
 
             // Copy generated gradle wrapper to library directory
             project.copy {
@@ -127,9 +146,10 @@ task wrapper(type: Wrapper) {
                 ":${repo.libraryProject}:uploadArchives".toString()
         ]
         def proc = execProcessBuilder(gradleCommand, wd, "gradlew")
-        println "Exit value: ${proc.exitValue()}"
-        println "${proc.in.text}"
-        println "${proc.err.text}"
+        if (proc.exitValue() != 0) {
+            throw new GradleScriptException(
+                    "Failed to build a dependency", null)
+        }
     }
 
     static def execProcessBuilder(List<String> gradleCommand, File wd, def tag) {
