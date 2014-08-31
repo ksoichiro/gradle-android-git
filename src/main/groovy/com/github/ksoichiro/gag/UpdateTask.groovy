@@ -37,10 +37,23 @@ class UpdateTask extends DefaultTask {
                             "Failed to initialize. Check your configuration and network connection.", null)
                 }
             }
-            checkout repo
-            uploadArchives repo
+            if (needsBuild(repo)) {
+                checkout repo
+                uploadArchives repo
+            } else {
+                println "  Dependency has been already built"
+            }
         }
         println "Done. Please put `${baseDir}/` to your .gitignore."
+    }
+
+    def needsBuild(Repo repo) {
+        def wd = new File("${project.git.directory}/${repo.name}")
+        def libraryBuildGradle = project.file("${project.git.directory}/${repo.name}/${repo.libraryProject}/build.gradle")
+        println libraryBuildGradle.path
+        def packagePath = repo.groupId.replaceAll("\\.", "/")
+        def aarPath = "${project.git.directory}/.repo/${packagePath}/${repo.artifactId}/${repo.resolvedVersion}/${repo.artifactId}-${repo.resolvedVersion}.aar"
+        !project.file(aarPath).exists()
     }
 
     def checkout(Repo repo) {
