@@ -24,8 +24,8 @@ if (isReleaseBuild) {
 
 // Note: These properties must be defined in ~/.gradle/gradle.properties
 // and signing.keyId, signing.password, signing.secretKeyRingFile, too.
-def username = project.getProperty("nexusUsername") ?: ""
-def password = project.getProperty("nexusPassword") ?: ""
+def username = hasProperty("nexusUsername") ? project.getProperty("nexusUsername") : ""
+def password = hasProperty("nexusPassword") ? project.getProperty("nexusPassword") : ""
 
 dependencies {
     compile gradleApi()
