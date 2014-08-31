@@ -12,6 +12,6 @@ class GagPluginTest {
         Project project = ProjectBuilder.builder().build()
         project.apply plugin: 'gag'
 
-        assertTrue(project.tasks.joke instanceof JokeTask)
+        assertTrue(project.tasks.update instanceof UpdateTask)
     }
 }
