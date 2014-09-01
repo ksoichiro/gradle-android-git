@@ -179,6 +179,15 @@ and `Run` it.
 
 ![](images/gradle2.png)
 
+## Prerequisites
+
+* Mac OS X / Windows 7
+* Gradle wrapper in your project
+* Gradle `>=` 1.12
+* Android Studio `>=` 0.8.0 (using Android Studio is optional)
+* Git repositories(dependencies) must be configured with Gradle
+* Git repositories(dependencies) must be public. Currently, authentication is not supported.
+
 ## Configuration
 
 ### git
