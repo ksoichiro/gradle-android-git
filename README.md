@@ -70,7 +70,7 @@ This script uses `gagconfig.gradle`.
 buildscript {
     repositories {
         mavenCentral()
-        // Sonatype repository
+        // If you want to use Sonatype repository, enable this:
         // maven {
         //     url uri('https://oss.sonatype.org/service/local/repositories/releases/content/')
         // }
@@ -107,9 +107,10 @@ Just edit your `repositories` and `dependencies` to use `.gag/.repo` contents.
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url uri('../repo')
-        }
+        // If you want to use Sonatype repository, enable this:
+        // maven {
+        //     url uri('https://oss.sonatype.org/service/local/repositories/releases/content/')
+        // }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.12.+'
