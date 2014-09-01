@@ -160,7 +160,9 @@ For example:
 $ ./gradlew installDebug
 ```
 
-If somebody in your team updated dependencies with new commit hash or tags, your build will fail because Gradle can't resolve dependencies.  
+Of course, you can build your app from Android Studio.
+
+If somebody in your team updated dependencies with new commit hash or tags, your build will fail because Gradle can't resolve new dependencies.  
 If you see that kind of errors, just `update`:
 
 ```sh
@@ -168,6 +170,14 @@ $ ./gradlew -b gag.gradle
 or
 $ ./gradlew -b gag.gradle update
 ```
+
+If you like Android Studio, select `gag.gradle` from the project tree on the left side,
+
+![](images/gradle1.png)
+
+and `Run` it.
+
+![](images/gradle2.png)
 
 ## Configuration
 
