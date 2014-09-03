@@ -170,6 +170,7 @@ task wrapper(type: Wrapper) {
                 .directory(wd)
         def env = pb.environment()
         env["PATH"] = System.getenv("PATH")
+        env["GIT_SSH"] = System.getenv("GIT_SSH")
         def proc = pb.start()
 
         // Avoid I/O blocking
