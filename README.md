@@ -1,6 +1,7 @@
 # gag (gradle-android-git)
 
 [![Build Status](https://travis-ci.org/ksoichiro/gradle-android-git.svg?branch=master)](https://travis-ci.org/ksoichiro/gradle-android-git)
+[![Maven Central](http://img.shields.io/maven-central/v/com.github.ksoichiro/gradle-android-git.svg)](https://github.com/ksoichiro/gradle-android-git/releases/latest)
 
 This is a Gradle plugin to manage Android dependency using Git.
 Usually, libraries are versioned with group, name and version numbers and you can download from Maven Central repository or jcenter.  
